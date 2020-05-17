@@ -35,6 +35,20 @@
     z-index: 1000;
     border-radius: 20px;
   }
+    #info-legendBox {
+    position: fixed;
+    width: 80%;
+    max-width: 400px;
+    height: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    color: #000000;
+    background-color: #d3d3d4;
+    z-index: 1000;
+    border-radius: 20px;
+  }
   #info-content {
     width: 100%;
     height: 80%;
@@ -48,6 +62,24 @@
     margin-bottom: 0;
   }
   #info-content p {
+    width: 100%;
+    overflow: auto;
+  }
+  
+
+  #info-legend {
+    width: 100%;
+    height: 80%;
+    overflow: auto;
+    font-size: 1em;
+  }
+  #info-legend h1 {
+    margin-top: 0;
+  }
+  #info-legend h3 {
+    margin-bottom: 0;
+  }
+  #info-legend p {
     width: 100%;
     overflow: auto;
   }
@@ -70,6 +102,7 @@
     background-color: #153054;
     transition: 0.1s ease-in-out;
   }
+
   #open-info {
     position: fixed;
     background-color: #c41230;
@@ -90,6 +123,30 @@
     margin-top: 8px;
   }
   #open-info:hover {
+    background-color: #153054;
+    transition: 0.1s ease-in-out;
+  }
+  
+    #open-legend {
+    position: fixed;
+    background-color: #c41230;
+    margin-left: 60px;
+    margin-top: 10px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    outline: 0;
+    border: 0;
+    border-radius: 20px;
+    z-index: 2000;
+  }
+  #open-legend h2 {
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 8px;
+  }
+  #open-legend:hover {
     background-color: #153054;
     transition: 0.1s ease-in-out;
   }
@@ -146,13 +203,97 @@
   .mapboxgl-popup-content .width {
     margin: 0;
     margin-bottom: 0.2em;
-    font-size: 2.5em;
+    font-size: 2.0em;
   }
   .mapboxgl-popup-content .message {
     margin: 0;
     margin-bottom: 0.2em;
     font-size: 1.5em;
   }
+  #menu {
+background: #fff;
+position: absolute;
+z-index: 2000;
+top: 55px;
+right: 50px;
+width: 120px;
+border: 0;
+font-family: 'Open Sans', sans-serif;
+}
+ 
+#menu a {
+font-size: 13px;
+color: #404040;
+display: block;
+margin: 0;
+padding: 0;
+padding: 10px;
+text-decoration: none;
+border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+text-align: center;
+}
+ 
+#menu a:last-child {
+border: none;
+}
+ 
+#menu a:hover {
+background-color: #f8f8f8;
+color: #404040;
+}
+ 
+#menu a.active {
+background-color: #c41230;
+color: #ffffff;
+}
+ 
+#menu a.active:hover {
+background: #153054;
+}
+
+.legend {
+
+top: 140px;
+
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+padding: 10px;
+position: absolute;
+z-index: 1;
+}
+ 
+.legend h4 {
+margin: 0 0 10px;
+}
+ 
+.legend div span {
+
+display: inline-block;
+height: 5px;
+margin-right: 5px;
+width: 10px;
+}
+
+.legend2 {
+top: 380px;
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+padding: 10px;
+position: absolute;
+
+z-index: 1;
+}
+ 
+.legend2 h4 {
+margin: 0 0 10px;
+}
+ 
+.legend2 div span {
+border-radius: 50%;
+display: inline-block;
+height: 5px;
+margin-right: 5px;
+width: 10px;
+}
+
 
 </style>
 </head>
@@ -180,9 +321,41 @@ type="text/css"
     </div>
   </div>
 
+
+  
+      <div id="info-legendBox" style='display:none'>
+    <div id="info-content">
+     
+     
+	  <div class="legend">
+	  <div><span style="background-color: #03a1fc"></span>Very Easy (> 20 feet)</div>
+<div><span style="background-color: #03fc7b"></span>Easy (16-20 feet)</div>
+<div><span style="background-color: #34e059"></span>Somewhat Easy (14-16 feet)</div>
+<div><span style="background-color: #a7ed2d"></span>Somewhat Difficult (12-14 feet)</div>
+<div><span style="background-color: #bab849"></span>Difficult (10-12 feet)</div>
+<div><span style="background-color: #de873c"></span>Very Difficult (6-10 feet)</div>
+<div><span style="background-color: #d7191c"></span>Impossible (0-6 feet)</div>
+</div>
+
+
+	  <h3>Sidewalk Width</h3>
+	  <p>Sidewalks are categorized by ease of social distancing. Based off width measurements derived from DC's Planimetric Sidewalk <a href="https://opendata.dc.gov/datasets/sidewalks">data</a>.</p>	  
+	  
+    </div>
+    <div id="info-button" onclick="closeLegend()">
+      <button>Return to the Map</button>
+    </div>
+	</div>
+
+
+
   <button id="open-info" onclick="openInfo()">
     <h2>i</h2>
   </button>
+  <button id="open-legend" onclick="openLegend()">
+    <h2>l</h2>
+  </button>
+
 
   <div id="map"></div>
 
@@ -199,6 +372,24 @@ type="text/css"
 
   function openInfo() {
     var x = document.getElementById("info");
+    if (x.style.display === "block") {
+      x.style.display = "none";
+    } else {
+      x.style.display = "block";
+    }
+  }
+  
+      function closeLegend() {
+    var x = document.getElementById("info-legendBox");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
+
+  function openLegend() {
+    var x = document.getElementById("info-legendBox");
     if (x.style.display === "block") {
       x.style.display = "none";
     } else {
@@ -314,32 +505,32 @@ type="text/css"
       var lineColor = e.features[0].layer.paint['line-color']
       var coordinates = e.lngLat;
 
-      if (lineWidth < 8) {
-        var message = 'This path is too narrow for social distancing.'
+      if (lineWidth < 6) {
+        var message = 'Social distancing will be impossible on this path.'
         var lineColor = '#d7191c'
-      } else if (lineWidth >= 8 && lineWidth < 10) {
-        var message = 'This path is too narrow for social distancing.'
+      } else if (lineWidth >= 6 && lineWidth < 10) {
+        var message = 'Social distancing may be very difficult on this path.'
         var lineColor = '#de873c'
 			} else if (lineWidth >= 10 && lineWidth < 12) {
         var message = 'Social distancing may be difficult on this path.'
         var lineColor = '#bab849'
       } else if (lineWidth >= 12 && lineWidth < 14) {
-        var message = 'Social distancing may be difficult on this path.'
+        var message = 'Social distancing may be somewhat difficult on this path.'
         var lineColor = '#a7ed2d'
 			} else if (lineWidth >= 14 && lineWidth < 16) {
-				var message = 'Social distancing should be possible on this path.'
+				var message = 'Social distancing may be somewhat easy on this path.'
 				var lineColor = '#65c334'
 			} else if (lineWidth >= 16 && lineWidth < 18) {
-				var message = 'Social distancing should be possible on this path.'
+				var message = 'Social distancing may be somewhat easy on this path.'
 				var lineColor = '#34e059'
 			} else if (lineWidth >= 18 && lineWidth < 20) {
 				var message = 'Social distancing should be easy on this path.'
 				var lineColor = '#03fc72'
 			} else if (lineWidth >= 22 && lineWidth < 24) {
-				var message = 'Social distancing should be easy on this path.'
+				var message = 'Social distancing should be very easy on this path.'
 				var lineColor = '#03fcda'
       } else {
-        var message = 'This path is great for social distancing!'
+        var message = 'Social distancing should be very easy on this path.'
         var lineColor = '#03a1fc'
       }
 
